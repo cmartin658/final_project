@@ -24,7 +24,20 @@ library(tidyverse)
 
 
 ```{r load-data}
-# load your data 
+library(tidyverse)
+
+prisons <- Population_30June2023_Quarterly
+
+prisonsboth <- prisons %>% 
+  slice(1:98)
+
+prisonsmales <- prisons %>% 
+  slice(99:194)
+
+prisonsfemales <- prisons %>% 
+  slice(195:289)
+
+
 
 
 
