@@ -37,7 +37,12 @@ prisonsmales <- prisons %>%
 prisonsfemales <- prisons %>% 
   slice(195:289)
 
+library(readr)
+prisoncrimes <- read_csv("C:/Users/kumis/Downloads/prison_pop_by_crime_2002-2015.csv")
+View(prisoncrimes)
+#need to chage file to where yours is stored
 
+names(earliercrimes) <- c("crime", "30-Jun-02","30-Jun-03","30-Jun-04", "30-Jun-05", "30-Jun-06", "30-Jun-07", "30-Jun-08", "30-Jun-09", "30-Jun-09(1)", "30-Jun-10", "30-Sep-10", "31-Dec-10", "31-Mar-11", "30-Jun-11","30-Sep-11", "31-Dec-11","31-Mar-12", "30-Jun-12", "30-Sep-12", "31-Dec-12", "31-Mar-13", "30-Jun-13", "30-Sep-13", "31-Dec-13", "31-Mar-14", "30-Jun-14", "30-Sep-14", "31-Dec-14", "31-Mar-15", "30-Jun-15")
 
 
 
