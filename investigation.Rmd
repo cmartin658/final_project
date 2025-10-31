@@ -16,7 +16,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r load-lib, message = FALSE}
 library(tidyverse)
-# Add any other libraries here
+library(readr)
+library(dplyr)
+library(janitor)
+
 
 
 
@@ -24,27 +27,68 @@ library(tidyverse)
 
 
 ```{r load-data}
-library(tidyverse)
+prison_pop_by_crime_2002_2015_forreal <- read_csv("data/prison_pop_by_crime_2002-2015-forreal.csv", 
+                                                  col_types = cols(...32 = col_skip(), 
+                                                                   ...33 = col_skip(), ...34 = col_skip(), 
+                                                                   `30-Jun-02` = col_number(), `30-Jun-03` = col_number(), 
+                                                                   `30-Jun-04` = col_number(), `30-Jun-05` = col_number(), 
+                                                                   `30-Jun-06` = col_number(), `30-Jun-07` = col_number(), 
+                                                                   `30-Jun-08` = col_number(), `30-Jun-09` = col_number(), 
+                                                                   `30-Jun-09(1)` = col_number(), `30-Jun-10` = col_number(), 
+                                                                   `30-Sep-10` = col_number(), `31-Dec-10` = col_number(), 
+                                                                   `31-Mar-11` = col_number(), `30-Jun-11` = col_number(), 
+                                                                   `30-Sep-11` = col_number(), `31-Dec-11` = col_number(), 
+                                                                   `31-Mar-12` = col_number(), `30-Jun-12` = col_number(), 
+                                                                   `30-Sep-12` = col_number(), `31-Dec-12` = col_number(), 
+                                                                   `31-Mar-13` = col_number(), `30-Jun-13` = col_number(), 
+                                                                   `30-Sep-13` = col_number(), `31-Dec-13` = col_number(), 
+                                                                   `31-Mar-14` = col_number(), `30-Jun-14` = col_number(), 
+                                                                   `30-Sep-14` = col_number(), `31-Dec-14` = col_number(), 
+                                                                   `31-Mar-15` = col_number(), `30-Jun-15` = col_number()), 
+                                                  skip = 1)
 
-prisons <- Population_30June2023_Quarterly
+prison_pop_by_crime_2015_2023_forrealforrealforsure <- read_csv("data/prison_pop_by_crime_2015-2023-forrealforrealforsure.csv", 
+                                                                skip = 1)
 
-prisonsboth <- prisons %>% 
-  slice(1:98)
+earliercrimes <- prison_pop_by_crime_2002_2015_forreal %>% 
+  slice(2:11)
+view(earliercrimes)
 
-prisonsmales <- prisons %>% 
-  slice(99:194)
-
-prisonsfemales <- prisons %>% 
-  slice(195:289)
-
-library(readr)
-prisoncrimes <- read_csv("C:/Users/kumis/Downloads/prison_pop_by_crime_2002-2015.csv")
-View(prisoncrimes)
-#need to chage file to where yours is stored
-
-names(earliercrimes) <- c("crime", "30-Jun-02","30-Jun-03","30-Jun-04", "30-Jun-05", "30-Jun-06", "30-Jun-07", "30-Jun-08", "30-Jun-09", "30-Jun-09(1)", "30-Jun-10", "30-Sep-10", "31-Dec-10", "31-Mar-11", "30-Jun-11","30-Sep-11", "31-Dec-11","31-Mar-12", "30-Jun-12", "30-Sep-12", "31-Dec-12", "31-Mar-13", "30-Jun-13", "30-Sep-13", "31-Dec-13", "31-Mar-14", "30-Jun-14", "30-Sep-14", "31-Dec-14", "31-Mar-15", "30-Jun-15")
+latercrimes <- prison_pop_by_crime_2015_2023_forrealforrealforsure %>% 
+  slice(2:14)
+view(latercrimes)
 
 
+#pivotting earlier data
+earlierpivoted <- (earliercrimes %>% 
+    pivot_longer(
+      cols = c(-"...1"),
+      names_to = 'date',
+      values_to = "numconvicts"
+    )) %>%
+  pivot_wider(
+    names_from = "...1",
+    values_from = "numconvicts"
+  ) %>% 
+  clean_names(earlierpivoted)
+
+#pivoting later data
+laterpivoted <- (latercrimes %>% 
+                   pivot_longer(
+                     cols = c(-"...1"),
+                     names_to = 'date',
+                     values_to = "numconvicts"
+                   )) %>%
+  pivot_wider(
+    names_from = "...1",
+    values_from = "numconvicts") %>% 
+  clean_names(laterpivoted)
+
+#this isnt working?
+earlierpivoted %>% 
+  mutate(
+    theft_offences = (burglary + theft_and_handling)
+  )
 
 
 
