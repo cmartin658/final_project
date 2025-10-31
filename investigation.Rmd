@@ -75,8 +75,9 @@ earlierpivoted <- (earliercrimes %>%
   pivot_wider(
     names_from = "...1",
     values_from = "numconvicts"
-  ) %>% 
-  clean_names(earlierpivoted)
+  )
+
+earlierpivoted <- clean_names(earlierpivoted)
 
 #pivoting later data
 laterpivoted <- (latercrimes %>% 
@@ -87,8 +88,9 @@ laterpivoted <- (latercrimes %>%
                    )) %>%
   pivot_wider(
     names_from = "...1",
-    values_from = "numconvicts") %>% 
-  clean_names(laterpivoted)
+    values_from = "numconvicts")
+
+laterpivoted <- clean_names(laterpivoted)
 
 #this isnt working?
 earlierpivoted %>% 
