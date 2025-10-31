@@ -49,8 +49,25 @@ prison_pop_by_crime_2002_2015 <- read_csv("data/prison_pop_by_crime_2002_2015.cs
 View(prison_pop_by_crime_2002_2015)
 
 
-prison_pop_by_crime_2015_2023<- read_csv("data/prison_pop_by_crime_2015_2023.csv", 
-                                                                skip = 1)
+prison_pop_by_crime_2015_2023 <- read_csv("data/prison_pop_by_crime_2015_2023.csv", 
+                                          col_types = cols(`30-Jun-15` = col_number(), 
+                                                           `30-Sep-15` = col_number(), `31-Dec-15` = col_number(), 
+                                                           `31-Mar-16` = col_number(), `30-Jun-16` = col_number(), 
+                                                           `30-Sep-16` = col_number(), `31-Dec-16` = col_number(), 
+                                                           `31-Mar-17` = col_number(), `30-Jun-17` = col_number(), 
+                                                           `30-Sep-17` = col_number(), `31-Dec-17` = col_number(), 
+                                                           `31-Mar-18` = col_number(), `30-Jun-18` = col_number(), 
+                                                           `30-Sep-18` = col_number(), `31-Dec-18` = col_number(), 
+                                                           `31-Mar-19` = col_number(), `30-Jun-19` = col_number(), 
+                                                           `30-Sep-19` = col_number(), `31-Dec-19` = col_number(), 
+                                                           `31-Mar-20` = col_number(), `30-Jun-20` = col_number(), 
+                                                           `30-Sep-20` = col_number(), `31-Dec-20` = col_number(), 
+                                                           `31-Mar-21` = col_number(), `30-Jun-21` = col_number(), 
+                                                           `30-Sep-21` = col_number(), `31-Dec-21` = col_number(), 
+                                                           `31-Mar-22` = col_number(), `30-Jun-22` = col_number(), 
+                                                           `30-Sep-22` = col_number(), `31-Dec-22` = col_number(), 
+                                                           `31-Mar-23` = col_number(), `30-Jun-23` = col_number()), 
+                                          skip = 1)
 view(prison_pop_by_crime_2015_2023)
 
 
