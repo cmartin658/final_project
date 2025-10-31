@@ -169,7 +169,7 @@ view(earlyrepivot)
 together <-  left_join(earlyrepivot, laterepivot, by = "crime") %>% 
   select(-"30-Jun-15.y") %>% 
   rename("30-Jun-15" = "30-Jun-15.x")
-view(together)
+View(together)
 
 
 
