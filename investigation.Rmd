@@ -81,6 +81,15 @@ latercrimes <- prison_pop_by_crime_2015_2023 %>%
   slice(2:14)
 view(latercrimes)
 
+# removing apare rows
+earliercrimes <- earliercrimes %>% 
+  select("...1" | (starts_with("30-Jun"))) %>% 
+  select(-"30-Jun-09(1)")
+
+latercrimes <- latercrimes %>% 
+  select("...1" | (starts_with("30-Jun")))
+
+
 
 #pivotting earlier data
 earlierpivoted <- (earliercrimes %>% 
@@ -109,11 +118,28 @@ laterpivoted <- (latercrimes %>%
 
 laterpivoted <- clean_names(laterpivoted)
 
-#this isnt working?
-earlierpivoted %>% 
+
+
+#grouping crimes together
+earlierpivotedgrouped <- earlierpivoted %>%
   mutate(
-    theft_offences = (burglary + theft_and_handling)
-  )
+    theft_offences = (burglary + theft_and_handling),
+    fraud_offences = fraud_and_forgery
+  ) %>% 
+  select(-"burglary", -"theft_and_handling", -"fraud_and_forgery")
+
+
+
+laterpivotedgrouped <- laterpivoted %>% 
+  mutate(
+    motoring_offences = summary_non_motoring,
+    other_offences = criminal_damage_and_arson + possession_of_weapons 
+    + miscellaneous_crimes_against_society + summary_non_motoring + public_order_offences
+  ) %>% 
+  select(-"summary_non_motoring", -"criminal_damage_and_arson", -"possession_of_weapons",
+         -"miscellaneous_crimes_against_society", -"summary_non_motoring", -"public_order_offences")
+
+view(laterpivotedgrouped)
 
 
 
