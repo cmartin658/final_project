@@ -141,6 +141,36 @@ laterpivotedgrouped <- laterpivoted %>%
 
 view(laterpivotedgrouped)
 
+laterepivot <- laterpivotedgrouped %>% 
+  pivot_longer(
+    cols = c(-"date"),
+    names_to = "crime",
+    values_to = "numconvicts"
+  ) %>% 
+  pivot_wider(
+    names_from = "date",
+    values_from = "numconvicts"
+  )
+
+
+earlyrepivot <- earlierpivotedgrouped %>% 
+  pivot_longer(
+    cols = c(-"date"),
+    names_to = "crime",
+    values_to = "numconvicts"
+  ) %>% 
+  pivot_wider(
+    names_from = "date",
+    values_from = "numconvicts"
+  )
+
+view(earlyrepivot)
+
+together <-  left_join(earlyrepivot, laterepivot, by = "crime") %>% 
+  select(-"30-Jun-15.y") %>% 
+  rename("30-Jun-15" = "30-Jun-15.x")
+view(together)
+
 
 
 ```
