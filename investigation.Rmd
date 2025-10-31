@@ -27,7 +27,7 @@ library(janitor)
 
 
 ```{r load-data}
-prison_pop_by_crime_2002_2015_forreal <- read_csv("data/prison_pop_by_crime_2002-2015-forreal.csv", 
+prison_pop_by_crime_2002_2015 <- read_csv("data/prison_pop_by_crime_2002_2015.csv", 
                                                   col_types = cols(...32 = col_skip(), 
                                                                    ...33 = col_skip(), ...34 = col_skip(), 
                                                                    `30-Jun-02` = col_number(), `30-Jun-03` = col_number(), 
@@ -46,15 +46,21 @@ prison_pop_by_crime_2002_2015_forreal <- read_csv("data/prison_pop_by_crime_2002
                                                                    `30-Sep-14` = col_number(), `31-Dec-14` = col_number(), 
                                                                    `31-Mar-15` = col_number(), `30-Jun-15` = col_number()), 
                                                   skip = 1)
+View(prison_pop_by_crime_2002_2015)
 
-prison_pop_by_crime_2015_2023_forrealforrealforsure <- read_csv("data/prison_pop_by_crime_2015-2023-forrealforrealforsure.csv", 
+
+prison_pop_by_crime_2015_2023<- read_csv("data/prison_pop_by_crime_2015_2023.csv", 
                                                                 skip = 1)
+view(prison_pop_by_crime_2015_2023)
 
-earliercrimes <- prison_pop_by_crime_2002_2015_forreal %>% 
+
+
+#SELECTING DATA WANTED
+earliercrimes <- prison_pop_by_crime_2002_2015 %>% 
   slice(2:11)
 view(earliercrimes)
 
-latercrimes <- prison_pop_by_crime_2015_2023_forrealforrealforsure %>% 
+latercrimes <- prison_pop_by_crime_2015_2023 %>% 
   slice(2:14)
 view(latercrimes)
 
