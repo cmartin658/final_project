@@ -1,0 +1,21 @@
+---
+title: "carla"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r load-lib, message = FALSE}
+library(tidyverse)
+library(readxl)
+
+```
+
+
+```{r load-data}
+library(tidyverse)
+
+```
