@@ -42,7 +42,7 @@ prison_pop_by_crime_2002_2015 <- read_csv("data/prison_pop_by_crime_2002_2015.cs
                                                                    `30-Sep-14` = col_number(), `31-Dec-14` = col_number(), 
                                                                    `31-Mar-15` = col_number(), `30-Jun-15` = col_number()), 
                                                   skip = 1)
-View(prison_pop_by_crime_2002_2015)
+
 
 
 prison_pop_by_crime_2015_2023 <- read_csv("data/prison_pop_by_crime_2015_2023.csv", 
@@ -64,18 +64,16 @@ prison_pop_by_crime_2015_2023 <- read_csv("data/prison_pop_by_crime_2015_2023.cs
                                                            `30-Sep-22` = col_number(), `31-Dec-22` = col_number(), 
                                                            `31-Mar-23` = col_number(), `30-Jun-23` = col_number()), 
                                           skip = 1)
-view(prison_pop_by_crime_2015_2023)
+
 
 
 
 #SELECTING DATA WANTED
 earliercrimes <- prison_pop_by_crime_2002_2015 %>% 
   slice(2:11)
-view(earliercrimes)
 
 latercrimes <- prison_pop_by_crime_2015_2023 %>% 
   slice(2:14)
-view(latercrimes)
 
 # removing apare rows
 earliercrimes <- earliercrimes %>% 
@@ -132,7 +130,6 @@ laterpivotedgrouped <- laterpivoted %>%
   select(-"summary_non_motoring", -"criminal_damage_and_arson", -"possession_of_weapons",
          -"miscellaneous_crimes_against_society", -"summary_non_motoring", -"public_order_offences")
 
-view(laterpivotedgrouped)
 
 laterepivot <- laterpivotedgrouped %>% 
   pivot_longer(
@@ -157,7 +154,6 @@ earlyrepivot <- earlierpivotedgrouped %>%
     values_from = "numconvicts"
   )
 
-view(earlyrepivot)
 
 together <-  left_join(earlyrepivot, laterepivot, by = "crime") %>% 
   select(-"30-Jun-15.y") %>% 
