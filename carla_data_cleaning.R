@@ -39,23 +39,8 @@ table_2015_2023 <- A1_4_2015_2023 %>%
          "30-Jun-22" = "...30",
          "30-Jun-23" = "Contents")
 
-# CLEAN ROW NAMES
 
-table_2002_2015$`30-Jun-15` <- as.numeric(as.character(table_2002_2015$`30-Jun-15`))
-
-pivot_2002 <- table_2002_2015 %>%
-  pivot_longer(
-    cols = c(-"Type"),
-    names_to = "date",
-    values_to = "numconvicts"
-  ) %>%
-  pivot_wider(
-    cols = c("Type"),
-    names_from = "Type",
-    values_from = "numconvicts"
-  )
-
-# SLICING
+# SLICING - USED 
 
 early_adults <- table_2002_2015 %>%
   slice(14:23)
@@ -66,12 +51,39 @@ early_18_20 <- table_2002_2015 %>%
 early_15_17 <- table_2002_2015 %>%
   slice(35:45)
 
+later_adults <- table_2015_2023 %>%
+  slice(17:29)
+
+later_18_20 <- table_2015_2023 %>%
+  slice(31:43)
+
+later_15_17 <- table_2015_2023 %>%
+  slice(45:57)
+
+
+# PIVOTING - USED
+
 pivot_2002 <- early_adults %>%
   pivot_longer(
     cols = c(-"Type"),
     names_to = "date",
     values_to = "numconvicts"
-  ) %>%
-  pivot_wider(
-    cols = 
   )
+
+pivot_2015 <- later_adults %>%
+  pivot_longer(
+    cols = c(-"Type"),
+    names_to = "date",
+    values_to = "numconvicts"
+  )
+
+pivot_2015 <- pivot_2015 %>%
+  pivot_wider(
+    names_from = "Type",
+    values_from = "numconvicts"
+  )
+  
+pivot_2015 <- pivot_2015 %>%
+  clean_names()
+  mutate(other_offences = criminal_damage_and_arson + possession_of_weapons + public_order_offences + miscellaneous_crimes_against_society + summary_non_motoring) %>%
+  select(Type, violence_against_the_person, sexual_offences, robbery, theft_offences, drug_offences, fraud_offences, summary_motoring, offence_not_recorded)
