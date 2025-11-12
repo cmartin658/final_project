@@ -3,6 +3,7 @@ library(readr)
 library(dplyr)
 library(janitor)
 library(readxl)
+library(lubridate)
 
 # REMOVING AND RENAMING COLUMNS
 
@@ -200,3 +201,43 @@ table_18_20 <- full_join(x = pivot_2002_18_20_combined_cols,
 
 table_15_17 <- full_join(x = pivot_2002_15_17_combined_cols,
                          y = pivot_2015_15_17_combined_cols)
+
+
+# COMBINE ALL TABLES WITH AGE
+
+adults <- adults %>%
+  mutate(age = "adult")
+table_18_20 <- table_18_20 %>%
+  mutate(age = "18-20")
+table_15_17 <- table_15_17 %>%
+  mutate(age = "15-17")
+
+whole_table <- full_join(adults, table_18_20)
+whole_table <- full_join(whole_table, table_15_17)
+
+
+# MAKING DATE COLUMN DATE DATA TYPE
+
+whole_table <- whole_table %>%
+  mutate(date = dmy(date))
+
+# PLOTS
+
+ggplot(data = whole_table,
+       mapping = aes(x = date,
+                     y = violence_against_the_person,
+                     colour = age)) +
+  geom_point()
+
+ggplot(data = whole_table,
+       mapping = aes(x = date,
+                     y = sexual_offences,
+                     colour = age)) +
+  geom_point()
+
+
+ggplot(data = whole_table,
+       mapping = aes(x = date,
+                     y = robbery,
+                     colour = age)) +
+  geom_point()
