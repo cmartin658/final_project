@@ -227,17 +227,47 @@ ggplot(data = whole_table,
        mapping = aes(x = date,
                      y = violence_against_the_person,
                      colour = age)) +
-  geom_point()
+  geom_line()
 
 ggplot(data = whole_table,
        mapping = aes(x = date,
                      y = sexual_offences,
                      colour = age)) +
-  geom_point()
+  geom_line()
 
 
 ggplot(data = whole_table,
        mapping = aes(x = date,
                      y = robbery,
                      colour = age)) +
-  geom_point()
+  geom_line()
+
+ggplot(data = whole_table,
+       mapping = aes(x = date,
+                     y = drug_offences,
+                     colour = age)) +
+  geom_line()
+
+ggplot(data = whole_table,
+       mapping = aes(x = date,
+                     y = robbery,
+                     colour = age)) +
+  geom_line()
+
+ggplot(data = whole_table,
+       mapping = aes(x = date,
+                     y = motoring_offences,
+                     colour = age)) +
+  geom_line()
+
+ggplot(data = whole_table,
+       mapping = aes(x = date,
+                     y = theft_offences,
+                     colour = age)) +
+  geom_line()
+
+ggplot(data = whole_table,
+       mapping = aes(x = date,
+                     y = fraud_offences,
+                     colour = age)) +
+  geom_line()
