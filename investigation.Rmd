@@ -19,11 +19,15 @@ library(tidyverse)
 library(readr)
 library(dplyr)
 library(janitor)
+
+
+
+
 ```
 
 
 ```{r load-data}
-prison_pop_by_crime_2002_2015 <- read_csv("data/prison_pop_by_crime_2002_2015.csv", 
+prison_pop_by_crime_2002_2015_forreal <- read_csv("data/prison_pop_by_crime_2002-2015-forreal.csv", 
                                                   col_types = cols(...32 = col_skip(), 
                                                                    ...33 = col_skip(), ...34 = col_skip(), 
                                                                    `30-Jun-02` = col_number(), `30-Jun-03` = col_number(), 
@@ -42,48 +46,18 @@ prison_pop_by_crime_2002_2015 <- read_csv("data/prison_pop_by_crime_2002_2015.cs
                                                                    `30-Sep-14` = col_number(), `31-Dec-14` = col_number(), 
                                                                    `31-Mar-15` = col_number(), `30-Jun-15` = col_number()), 
                                                   skip = 1)
-View(prison_pop_by_crime_2002_2015)
 
+prison_pop_by_crime_2015_2023_forrealforrealforsure <- read_csv("data/prison_pop_by_crime_2015-2023-forrealforrealforsure.csv", 
+                                                                skip = 1)
 
-prison_pop_by_crime_2015_2023 <- read_csv("data/prison_pop_by_crime_2015_2023.csv", 
-                                          col_types = cols(`30-Jun-15` = col_number(), 
-                                                           `30-Sep-15` = col_number(), `31-Dec-15` = col_number(), 
-                                                           `31-Mar-16` = col_number(), `30-Jun-16` = col_number(), 
-                                                           `30-Sep-16` = col_number(), `31-Dec-16` = col_number(), 
-                                                           `31-Mar-17` = col_number(), `30-Jun-17` = col_number(), 
-                                                           `30-Sep-17` = col_number(), `31-Dec-17` = col_number(), 
-                                                           `31-Mar-18` = col_number(), `30-Jun-18` = col_number(), 
-                                                           `30-Sep-18` = col_number(), `31-Dec-18` = col_number(), 
-                                                           `31-Mar-19` = col_number(), `30-Jun-19` = col_number(), 
-                                                           `30-Sep-19` = col_number(), `31-Dec-19` = col_number(), 
-                                                           `31-Mar-20` = col_number(), `30-Jun-20` = col_number(), 
-                                                           `30-Sep-20` = col_number(), `31-Dec-20` = col_number(), 
-                                                           `31-Mar-21` = col_number(), `30-Jun-21` = col_number(), 
-                                                           `30-Sep-21` = col_number(), `31-Dec-21` = col_number(), 
-                                                           `31-Mar-22` = col_number(), `30-Jun-22` = col_number(), 
-                                                           `30-Sep-22` = col_number(), `31-Dec-22` = col_number(), 
-                                                           `31-Mar-23` = col_number(), `30-Jun-23` = col_number()), 
-                                          skip = 1)
-view(prison_pop_by_crime_2015_2023)
-
-
-
-#SELECTING DATA WANTED
-earliercrimes <- prison_pop_by_crime_2002_2015 %>% 
+earliercrimes <- prison_pop_by_crime_2002_2015_forreal %>% 
   slice(2:11)
 view(earliercrimes)
 
-latercrimes <- prison_pop_by_crime_2015_2023 %>% 
+latercrimes <- prison_pop_by_crime_2015_2023_forrealforrealforsure %>% 
   slice(2:14)
 view(latercrimes)
 
-# removing apare rows
-earliercrimes <- earliercrimes %>% 
-  select("...1" | (starts_with("30-Jun"))) %>% 
-  select(-"30-Jun-09(1)")
-
-latercrimes <- latercrimes %>% 
-  select("...1" | (starts_with("30-Jun")))
 
 #pivotting earlier data
 earlierpivoted <- (earliercrimes %>% 
@@ -95,9 +69,8 @@ earlierpivoted <- (earliercrimes %>%
   pivot_wider(
     names_from = "...1",
     values_from = "numconvicts"
-  )
-
-earlierpivoted <- clean_names(earlierpivoted)
+  ) %>% 
+  clean_names(earlierpivoted)
 
 #pivoting later data
 laterpivoted <- (latercrimes %>% 
@@ -108,116 +81,293 @@ laterpivoted <- (latercrimes %>%
                    )) %>%
   pivot_wider(
     names_from = "...1",
-    values_from = "numconvicts")
+    values_from = "numconvicts") %>% 
+  clean_names(laterpivoted)
 
-laterpivoted <- clean_names(laterpivoted)
-
-
-
-#grouping crimes together
-earlierpivotedgrouped <- earlierpivoted %>%
+#this isnt working?
+earlierpivoted %>% 
   mutate(
-    theft_offences = (burglary + theft_and_handling),
-    fraud_offences = fraud_and_forgery
-  ) %>% 
-  select(-"burglary", -"theft_and_handling", -"fraud_and_forgery")
-
-
-laterpivotedgrouped <- laterpivoted %>% 
-  mutate(
-    motoring_offences = summary_non_motoring,
-    other_offences = criminal_damage_and_arson + possession_of_weapons 
-    + miscellaneous_crimes_against_society + summary_non_motoring + public_order_offences
-  ) %>% 
-  select(-"summary_non_motoring", -"criminal_damage_and_arson", -"possession_of_weapons",
-         -"miscellaneous_crimes_against_society", -"summary_non_motoring", -"public_order_offences")
-
-view(laterpivotedgrouped)
-
-laterepivot <- laterpivotedgrouped %>% 
-  pivot_longer(
-    cols = c(-"date"),
-    names_to = "crime",
-    values_to = "numconvicts"
-  ) %>% 
-  pivot_wider(
-    names_from = "date",
-    values_from = "numconvicts"
-  )
-
-
-earlyrepivot <- earlierpivotedgrouped %>% 
-  pivot_longer(
-    cols = c(-"date"),
-    names_to = "crime",
-    values_to = "numconvicts"
-  ) %>% 
-  pivot_wider(
-    names_from = "date",
-    values_from = "numconvicts"
-  )
-
-view(earlyrepivot)
-
-together <-  left_join(earlyrepivot, laterepivot, by = "crime") %>% 
-  select(-"30-Jun-15.y") %>% 
-  rename("30-Jun-15" = "30-Jun-15.x")
-view(together)
-
-#Scatter Graph 1
-#Classify crimes into two groups: violent and non-violent
-violent_nonviolent <- together %>%
-  mutate(
-    crime_type = case_when(
-      crime %in% c("violence_against_the_person", "sexual_offences", "robbery") ~ "Violent Crimes",
-      crime %in% c("drug_offences", "motoring_offences", "theft_offences", "fraud_offences") ~ "Non-violent Crimes",
-      crime %in% c("other_offences", "offence_not_recorded") ~ "Other",
-      TRUE ~ NA_character_
-    )
-  ) %>%
-  filter(!is.na(crime_type))
-
-#Convert from wide to long format
-violent_long <- violent_nonviolent %>%
-  pivot_longer(
-    cols = starts_with("30-Jun"),
-    names_to = "date",
-    values_to = "count"
-  )
-
-#Convert the date column to proper date format
-violent_long <- violent_long %>%
-  mutate(
-    date = as.Date(date, format = "%d-%b-%y")
-  )
-
-#Group and sum all counts
-violent_summary <- violent_long %>%
-  group_by(crime_type, date) %>%
-  summarise(total_count = sum(count, na.rm = TRUE), .groups = "drop")
-
-#Plot a scatter graph to show how different types of crime evolve in time
-ggplot(violent_summary, aes(x = date, y = total_count, color = crime_type)) +
-  geom_point(alpha = 0.5) +
-  geom_line(size = 1.2) +
-  scale_color_manual(
-    values = c(
-      "Violent Crimes" = "darkred",
-      "Non-violent Crimes" = "orange",
-      "Other" = "grey"
-    )
-  ) +
-  labs(
-    title = "Types of Crime Over Time",
-    subtitle = "Grouped by Violent, Non-violent, and Other Crimes",
-    x = "Date",
-    y = "Total Count"
-  ) +
-  theme_minimal() +
-  theme(
-    legend.position = "bottom",
-    legend.title = element_blank()
+    theft_offences = (burglary + theft_and_handling)
   )
 ```
+
+```{r }
+library(tidyverse)
+library(readr)
+Population_30June2023_Annual_Sentencelength<- read_csv("data/Population_30June2023_Annual_Sentencelength - Copy.csv")
+
+# split into women and men
+Women.sentence.lengths <- Population_30June2023_Annual_Sentencelength %>%
+  slice(1,34:49)
+
+Male.sentence.lengths <- Population_30June2023_Annual_Sentencelength %>%
+  slice(1,18:33)
+
+sentencelengthspivoted <- (Women.sentence.lengths %>% 
+    pivot_longer(
+      cols = c("Table A1.6: Prison population under immediate custodial sentence by sentence length, offence group and sex; 30 June 2023"),
+      names_to = 'sentence lengths',
+      values_to = "numconvicts"
+    )) 
+
+
+# fixing the titles of the columns
+colnames(Women.sentence.lengths) <- Women.sentence.lengths[1, ]
+Women.sentence.lengths <- Women.sentence.lengths[-2, ]
+rownames(Women.sentence.lengths) <- NULL
+
+colnames(Male.sentence.lengths) <- Male.sentence.lengths[1, ]
+Male.sentence.lengths <- Male.sentence.lengths[-2, ]
+rownames(Male.sentence.lengths) <- NULL
+
+
+#splitting into violent and non violent crimes
+colnames(Male.sentence.lengths)[is.na(colnames(Male.sentence.lengths))][1] <- "Sentence length"
+
+Male.sentence.lengths.V <- select(Male.sentence.lengths, 1, 2, 3, 4, 6, 8) %>% 
+  slice(-1)
+
+Male.sentence.lengths.nV <- select(Male.sentence.lengths, 1, 5, 7, 9, 10, 11, 12, 13) %>% 
+  slice(-1)
+
+colnames(Women.sentence.lengths)[is.na(colnames(Women.sentence.lengths))][1] <- "Sentence length"
+
+Women.sentence.lengths.V <- select(Women.sentence.lengths, 1, 2, 3, 4, 6, 8) %>% 
+  slice(-1)
+
+Women.sentence.lengths.nV <- select(Women.sentence.lengths, 1, 5, 7, 9, 10, 11, 12, 13) %>% 
+  slice(-1)
+
+
+# make all variables numeric
+Male.sentence.lengths.V$`Violence against the person`<- parse_number(Male.sentence.lengths.V$`Violence against the person`)
+
+Male.sentence.lengths.V$`Sexual offences`<- parse_number(Male.sentence.lengths.V$`Sexual offences`)
+
+Male.sentence.lengths.V$Robbery<- parse_number(Male.sentence.lengths.V$Robbery)
+
+Male.sentence.lengths.V$`Criminal damage and arson`<- parse_number(Male.sentence.lengths.V$`Criminal damage and arson`)
+
+Male.sentence.lengths.V$`Possession of weapons`<- parse_number(Male.sentence.lengths.V$`Possession of weapons`)
+
+
+Women.sentence.lengths.V$`Violence against the person`<- parse_number(Women.sentence.lengths.V$`Violence against the person`)
+
+Women.sentence.lengths.V$`Sexual offences`<- parse_number(Women.sentence.lengths.V$`Sexual offences`)
+
+Women.sentence.lengths.V$Robbery<- parse_number(Women.sentence.lengths.V$Robbery)
+
+Women.sentence.lengths.V$`Criminal damage and arson`<- parse_number(Women.sentence.lengths.V$`Criminal damage and arson`)
+
+Women.sentence.lengths.V$`Possession of weapons`<- parse_number(Women.sentence.lengths.V$`Possession of weapons`)
+
+
+
+
+Male.sentence.lengths.nV$`Theft Offences`<- parse_number(Male.sentence.lengths.nV$`Theft Offences`)
+
+Male.sentence.lengths.nV$`Drug offences`<- 
+  parse_number(Male.sentence.lengths.nV$`Drug offences`)
+
+Male.sentence.lengths.nV$`Public order offences` <- parse_number(Male.sentence.lengths.nV$`Public order offences`)
+
+Male.sentence.lengths.nV$`Miscellaneous crimes against society`<- parse_number(Male.sentence.lengths.nV$`Miscellaneous crimes against society`)
+
+Male.sentence.lengths.nV$`Fraud Offences`<- parse_number(Male.sentence.lengths.nV$`Fraud Offences`)
+
+Male.sentence.lengths.nV$`Summary Non-Motoring` <- parse_number(Male.sentence.lengths.nV$`Summary Non-Motoring`)
+
+Male.sentence.lengths.nV$`Summary motoring` <- parse_number(Male.sentence.lengths.nV$`Summary motoring`)
+
+
+
+Women.sentence.lengths.nV$`Theft Offences`<- parse_number(Women.sentence.lengths.nV$`Theft Offences`)
+
+Women.sentence.lengths.nV$`Drug offences`<- 
+  parse_number(Women.sentence.lengths.nV$`Drug offences`)
+
+Women.sentence.lengths.nV$`Public order offences` <- parse_number(Women.sentence.lengths.nV$`Public order offences`)
+
+Women.sentence.lengths.nV$`Miscellaneous crimes against society`<- parse_number(Women.sentence.lengths.nV$`Miscellaneous crimes against society`)
+
+Women.sentence.lengths.nV$`Fraud Offences`<- parse_number(Women.sentence.lengths.nV$`Fraud Offences`)
+
+Women.sentence.lengths.nV$`Summary Non-Motoring` <- parse_number(Women.sentence.lengths.nV$`Summary Non-Motoring`)
+
+Women.sentence.lengths.nV$`Summary motoring` <- parse_number(Women.sentence.lengths.nV$`Summary motoring`)
+
+Male.sentence.lengths.nV <- janitor::clean_names(Male.sentence.lengths.nV)
+
+Male.sentence.lengths.V <- janitor::clean_names(Male.sentence.lengths.V)
+
+Women.sentence.lengths.nV <- janitor::clean_names(Women.sentence.lengths.nV)
+
+Women.sentence.lengths.V <- janitor::clean_names(Women.sentence.lengths.V)
+
+
+# Make a totals and percentage totals column 
+
+Male.sentence.lengths.V <- 
+mutate(Male.sentence.lengths.V, 
+       total = rowSums(across(2:5)), 
+       Percentage_of_total = (total / 66583)*100)
+
+Women.sentence.lengths.V <- mutate(Women.sentence.lengths.V, 
+       total = rowSums(across(2:5)), 
+       Percentage_of_total = (total / 2181)*100)
+
+Male.sentence.lengths.nV <- mutate(Male.sentence.lengths.nV, 
+       total = rowSums(across(2:8)), 
+       Percentage_of_total = (total / 40160)*100)
+
+Women.sentence.lengths.nV <- mutate(Women.sentence.lengths.nV, 
+       total = rowSums(across(2:8)), 
+       Percentage_of_total = (total / 1770)*100)
+
+summarise(Women.sentence.lengths.nV, sum(total))
+summarise(Male.sentence.lengths.nV, sum(total))
+summarise(Women.sentence.lengths.V, sum(total))
+summarise(Male.sentence.lengths.V, sum(total))
+
+
+# making violent and non violent crimes tables with women and men
+
+Non_Violent_Crimes <- full_join(Women.sentence.lengths.nV, Male.sentence.lengths.nV) %>% 
+  mutate(Gender = case_when(
+    row_number() <= 15 ~ "Female",
+  TRUE ~ "Male"))
+view(Non_Violent_Crimes)
+
+Violent_Crimes <- full_join(Women.sentence.lengths.V, Male.sentence.lengths.V) %>% 
+  mutate(Gender = case_when(
+    row_number() <= 15 ~ "Female",
+  TRUE ~ "Male"))
+View(Violent_Crimes)
+
+Crimes <- full_join(Non_Violent_Crimes, Violent_Crimes)
+view(Crimes)
+
+
+
+# graphing the proportion of crime types by gender
+
+Graphing_V_Crimes <-
+  select(Violent_Crimes, 
+         Gender, 
+         violence_against_the_person:possession_of_weapons) %>%
+  pivot_longer(cols = -Gender, 
+               names_to = "crime_type", 
+               values_to = "count")
+
+ggplot(Graphing_V_Crimes, 
+       aes(
+         x = crime_type, 
+         y = count, 
+         fill = Gender)) +
+  geom_col(position = "fill") +
+  coord_flip() +
+  labs(title = "Proportion of Crime Types by Gender",
+       subtitle = "Violent Crimes",
+       x = "Crime Type", 
+       y = "Proportion") +
+  scale_fill_manual(values = c("Female" = "pink", "Male" = "lightblue"))
+
+Graphing_nV_Crimes <-
+  select(Non_Violent_Crimes, 
+         Gender, 
+         theft_offences:summary_motoring) %>%
+  pivot_longer(cols = -Gender, 
+               names_to = "crime_type", 
+               values_to = "count")
+
+ggplot(Graphing_nV_Crimes, 
+       aes(
+         x = crime_type, 
+         y = count, fill = Gender)) +
+  geom_col(position = "fill") +
+  coord_flip() +
+  labs(title = "Proportion of Crime Types by Gender",
+       subtitle = "Non-Violent Crimes",
+       x = "Crime Type", y = "Proportion") +
+  scale_fill_manual(values = c("Female" = "pink", "Male" = "lightblue"))
+
+
+
+# plotting pie charts of the proportion of different crime types by each group of people
+
+Women.sentence.lengths.V.Pivoted <-  summarise(Women.sentence.lengths.V, across(violence_against_the_person:possession_of_weapons, sum)) %>%
+  pivot_longer(everything(), 
+               names_to = "crime_type", 
+               values_to = "count")
+
+ggplot(Women.sentence.lengths.V.Pivoted, 
+       aes(
+         x = "", 
+         y = count, 
+         fill = crime_type)) +
+  geom_bar(stat = "identity", 
+           width = 1) +
+  coord_polar("y") +
+  labs(title = "Female Violent Offenders: Crime Type Distribution")
+
+Male.sentence.lengths.V.Pivoted <-  
+  summarise(Male.sentence.lengths.V, 
+            across(
+    violence_against_the_person:possession_of_weapons, 
+    sum)) %>%
+  pivot_longer(everything(), 
+               names_to = "crime_type", 
+               values_to = "count")
+
+ggplot(Male.sentence.lengths.V.Pivoted, 
+       aes(
+         x = "", 
+         y = count, 
+         fill = crime_type)) +
+  geom_bar(stat = "identity", 
+           width = 1) +
+  coord_polar("y") +
+  labs(title = "Male Violent Offenders: Crime Type Distribution")
+
+Women.sentence.lengths.nV.Pivoted <-  summarise(Women.sentence.lengths.nV, across(theft_offences:summary_motoring, 
+                         sum)) %>%
+  pivot_longer(everything(), 
+               names_to = "crime_type", 
+               values_to = "count")
+
+ggplot(Women.sentence.lengths.nV.Pivoted, 
+       aes(
+         x = "", 
+         y = count, 
+         fill = crime_type)) +
+  geom_bar(stat = "identity", 
+           width = 1) +
+  coord_polar("y") +
+  labs(title = "Female Non Violent Offenders: Crime Type Distribution")
+
+Male.sentence.lengths.nV.Pivoted <-  summarise(Male.sentence.lengths.nV, 
+                                               across(theft_offences:summary_motoring, 
+                                           sum)) %>%
+  pivot_longer(everything(), 
+               names_to = "crime_type", 
+               values_to = "count")
+
+ggplot(Male.sentence.lengths.nV.Pivoted, 
+       aes(
+         x = "", 
+         y = count, 
+         fill = crime_type)) +
+  geom_bar(stat = "identity", 
+           width = 1) +
+  coord_polar("y") +
+  labs(title = "Male Non Violent Offenders: Crime Type Distribution")
+
+
+# histogram with changing the first column to numeric variables against total people to see the distribution
+
+
+```
+
+
 
 
