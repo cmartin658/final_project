@@ -639,3 +639,59 @@ ggplot(data = whole_table,
 
 ```
 
+```{r load-data}
+#Scatter Graph 1
+#Classify crimes into two groups: violent and non-violent
+violent_nonviolent <- together %>%
+  mutate(
+    crime_type = case_when(
+      crime %in% c("violence_against_the_person", "sexual_offences", "robbery") ~ "Violent Crimes",
+      crime %in% c("drug_offences", "motoring_offences", "theft_offences", "fraud_offences") ~ "Non-violent Crimes",
+      crime %in% c("other_offences", "offence_not_recorded") ~ "Other",
+      TRUE ~ NA_character_
+    )
+  ) %>%
+  filter(!is.na(crime_type))
+
+#Convert from wide to long format
+violent_long <- violent_nonviolent %>%
+  pivot_longer(
+    cols = starts_with("30-Jun"),
+    names_to = "date",
+    values_to = "count"
+  )
+
+#Convert the date column to proper date format
+violent_long <- violent_long %>%
+  mutate(
+    date = as.Date(date, format = "%d-%b-%y")
+  )
+
+#Group and sum all counts
+violent_summary <- violent_long %>%
+  group_by(crime_type, date) %>%
+  summarise(total_count = sum(count, na.rm = TRUE), .groups = "drop")
+
+#Plot a scatter graph to show how different types of crime evolve in time
+ggplot(violent_summary, aes(x = date, y = total_count, color = crime_type)) +
+  geom_point(alpha = 0.5) +
+  geom_line(size = 1.2) +
+  scale_color_manual(
+    values = c(
+      "Violent Crimes" = "darkred",
+      "Non-violent Crimes" = "orange",
+      "Other" = "grey"
+    )
+  ) +
+  labs(
+    title = "Types of Crime Over Time",
+    subtitle = "Grouped by Violent, Non-violent, and Other Crimes",
+    x = "Date",
+    y = "Total Count"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_blank()
+  )
+```
